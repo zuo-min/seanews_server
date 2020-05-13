@@ -4,4 +4,8 @@ const apiCtrl = require('../controllers/apiController.js')
 
 // 登录验证j
 route.post('/api/login',apiCtrl.login);
+// 新闻类型
+route.get('/api/newstype',apiCtrl.newstype);
+// 新闻列表
+route.get('/api/newslist',apiCtrl.newslist);
 module.exports = route
