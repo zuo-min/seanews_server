@@ -8,4 +8,8 @@ route.post('/api/login',apiCtrl.login);
 route.get('/api/newstype',apiCtrl.newstype);
 // 新闻列表
 route.get('/api/newslist',apiCtrl.newslist);
+// 新增新闻
+route.post('/api/newsadd',apiCtrl.newsadd);
+// 删除新闻
+route.get('/api/newsdel',apiCtrl.newsdel);
 module.exports = route
