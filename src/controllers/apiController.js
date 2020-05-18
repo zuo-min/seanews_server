@@ -18,6 +18,7 @@ exports.login = (req, res) => {
   let resObj = { status: successStatus, message: '' }
   let sql = 'select * from login where zhanghao = ? and password = ?';
   con.query(sql, [zhanghao, password], (err, data) => {
+    // console.log(data)
     if (err) {
       resObj.status = failStatus
       resObj.message = err.message
@@ -25,6 +26,7 @@ exports.login = (req, res) => {
       return
     }
     if (data.length > 0) {
+      // console.log(data)
       let str = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz23456789'
       let token = ''
       let refresh_token = ""
@@ -37,7 +39,8 @@ exports.login = (req, res) => {
       Object.assign(resObj,{data:{
         id: Math.floor(Math.random()*1000),
         name: zhanghao,
-        photo:'http://localhost:8888/user_photo/d5.png',
+        identity: data[0].identity,
+        photo: data[0].photo,
         token,
         refresh_token
       }})
@@ -170,5 +173,129 @@ exports.newsdel = (req,res) => {
       resObj.message = '删除数据成功'
       res.end(JSON.stringify(resObj))
     }
+  })
+}
+
+// 获取新闻根据id
+exports.newsbyid = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  let Id = req.query.id
+  // console.log(Id)
+  let sql = `select * from news_list where Id = ${Id}`
+  con.query(sql,(err,data) => {
+    if (err) {
+      resObj.status = failStatus
+      resObj.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '根据新闻id获取成功!'
+      Object.assign(resObj, {data})
+      res.end(JSON.stringify(resObj))
+    }
+  })
+}
+
+// 修改新闻
+exports.newsedit = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  let Id = req.query.id
+  let {title,news,type,pubdate} = req.body
+  title = `'${title}'`
+  news = `'${news}'`
+  news = news.replace('<p>', '')
+  news = news.replace('</p>', '')
+  let sql = `update news_list set title=${title},news=${news},type=${type},pubdate=${pubdate} where Id =${Id}`
+  con.query(sql,(err,data) => {
+    if (err) {
+      resObj.status = failStatus
+      resObj.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '新闻修改成功！'
+      res.end(JSON.stringify(resObj))
+    }
+  })
+}
+
+// 获取个人信息
+exports.account = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  // console.log(req.query.zhanghao)
+  let zhanghao = req.query.zhanghao
+  let sql = `select * from login where zhanghao = ${zhanghao}`
+  con.query(sql,(err,data) => {
+    if (err) {
+      resObj.status = failStatus
+      resObj.status.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '获取个人信息成功'
+      Object.assign(resObj, {data})
+      res.end(JSON.stringify(resObj))
+    } 
+  })
+}
+
+// 修改后台登录密码
+exports.pwdedit = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  let newPwd = req.body.newPwd
+  let Id = req.query.id
+  newPwd = `'${newPwd}'`
+  let sql = `update login set password = ${newPwd} where Id=${Id}`
+  // console.log(sql)
+  con.query(sql,(err,data) => {
+    if (err) {
+      resObj.status = failStatus
+      resObj.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '密码修改成功!'
+      Object.assign(resObj,req.body)
+      res.end(JSON.stringify(resObj))
+    } 
+  })
+}
+
+// 审核改变状态
+exports.editstatus = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  let {id,num} = req.body
+  // console.log(num,id)
+  if (num === 0) {
+    var sql = `update news_list set status = '1' where Id=${id}`
+  } else {
+    var sql = `update news_list set status = '2' where Id=${id}`
+  }
+  con.query(sql,(err,data) => {
+    if (err) {
+      resObj.status = failStatus
+      resObj.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '审核成功!'
+      res.end(JSON.stringify(resObj))
+    } 
+  })
+} 
+
+// 修改头像
+exports.userphoto = (req,res) => {
+  let resObj = { status: successStatus, message: ''}
+  let photoName = req.body.photoName
+  console.log(photoName)
+  let url = 'http://localhost:8888/user_photo/' + photoName
+  console.log(url)
+  let sql = `update login set photo=${url}`
+  con.query(sql,(err,data) => {
+    console.log(data)
+    if (err) {
+      resObj.status = failStatus
+      resObj.message = err.message
+      res.end(JSON.stringify(resObj))
+    } else {
+      resObj.message = '修改头像成功!'
+      res.end(JSON.stringify(resObj))
+    } 
   })
 }
