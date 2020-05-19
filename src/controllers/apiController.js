@@ -1,4 +1,5 @@
 const mysql = require('mysql')
+
 // 链接数据库
 const con = mysql.createConnection({
   host: 'localhost',
@@ -136,16 +137,28 @@ exports.newslist = (req,res) => {
   }
 }
 
+var img_url_name = ''
+// 新增新闻图片地址获取
+exports.newsadd_imgname = (req,res) => {
+  let url = 'http://localhost:8888/news_img/' + req.file.filename
+  url = `'${url}'`
+  img_url_name = url
+}
 // 新增新闻
 exports.newsadd = (req,res) => {
+  // console.log(img_url_name)
   let resObj = { status: successStatus, message: '' }
   let {title,news,type,pubdate} = req.body
   title = `'${title}'`
   news = `'${news}'`
-  news = news.replace('<p>', '')
-  news = news.replace('</p>', '')
+  // news = news.replace('<p>', '')
+  // news = news.replace('</p>', '')
   // console.log(title)
-  let sql = `insert into news_list (title,news,type,pubdate,status) values(${title},${news},${type},${pubdate},'0')`
+  if (img_url_name === '') {
+    var sql = `insert into news_list (title,news,type,pubdate,status) values(${title},${news},${type},${pubdate},'0')`
+  } else {
+    var sql = `insert into news_list (title,news,type,pubdate,status,image) values(${title},${news},${type},${pubdate},'0',${img_url_name})`
+  }
   con.query(sql,(err,data) => {
     if (err) {
       resObj.status = failStatus
@@ -202,8 +215,8 @@ exports.newsedit = (req,res) => {
   let {title,news,type,pubdate} = req.body
   title = `'${title}'`
   news = `'${news}'`
-  news = news.replace('<p>', '')
-  news = news.replace('</p>', '')
+  // news = news.replace('<p>', '')
+  // news = news.replace('</p>', '')
   let sql = `update news_list set title=${title},news=${news},type=${type},pubdate=${pubdate} where Id =${Id}`
   con.query(sql,(err,data) => {
     if (err) {
@@ -282,20 +295,20 @@ exports.editstatus = (req,res) => {
 // 修改头像
 exports.userphoto = (req,res) => {
   let resObj = { status: successStatus, message: ''}
-  let photoName = req.body.photoName
-  console.log(photoName)
-  let url = 'http://localhost:8888/user_photo/' + photoName
-  console.log(url)
+  let url = 'http://localhost:8888/user_photo/' + req.file.filename
+  url = `'${url}'`
   let sql = `update login set photo=${url}`
   con.query(sql,(err,data) => {
-    console.log(data)
     if (err) {
       resObj.status = failStatus
       resObj.message = err.message
       res.end(JSON.stringify(resObj))
     } else {
       resObj.message = '修改头像成功!'
+      Object.assign(resObj,{photo: url})
       res.end(JSON.stringify(resObj))
     } 
   })
 }
+
+
