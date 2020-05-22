@@ -63,4 +63,10 @@ route.post('/api/editstatus',apiCtrl.editstatus);
 
 // 修改头像
 route.post('/api/userphoto',upload_user.single('file'),apiCtrl.userphoto)
+
+// 获取新闻类型数量
+route.get('/api/pie_type',apiCtrl.pie_type)
+
+// 获取新闻状态数量
+route.get('/api/pie_status',apiCtrl.pie_status)
 module.exports = route
