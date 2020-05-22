@@ -43,6 +43,7 @@ route.post('/api/newsadd',apiCtrl.newsadd);
 
 // 新增新闻图片地址获取
 route.post('/api/newsadd_imgname',upload_news.single('file'),apiCtrl.newsadd_imgname)
+
 // 删除新闻
 route.get('/api/newsdel',apiCtrl.newsdel);
 

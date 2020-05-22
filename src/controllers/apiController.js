@@ -219,7 +219,11 @@ exports.newsedit = (req, res) => {
   news = `'${news}'`
   // news = news.replace('<p>', '')
   // news = news.replace('</p>', '')
-  let sql = `update news_list set title=${title},news=${news},type=${type},pubdate=${pubdate} where Id =${Id}`
+  if (img_url_name === '') {
+    var sql = `update news_list set title=${title},news=${news},type=${type},pubdate=${pubdate} where Id =${Id}`
+  } else {
+    var sql = `update news_list set title=${title},news=${news},type=${type},pubdate=${pubdate},image=${img_url_name} where Id =${Id}`
+  }
   con.query(sql, (err, data) => {
     if (err) {
       resObj.status = failStatus
@@ -365,7 +369,7 @@ exports.pie_type = (req, res) => {
       temp.name = key
       list.push(temp)
     }
-    console.log(list)
+    // console.log(list)
     if (err) {
       resObj.status = failStatus
       resObj.message = err.message
