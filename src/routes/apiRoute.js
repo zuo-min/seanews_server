@@ -70,4 +70,10 @@ route.get('/api/pie_type',apiCtrl.pie_type)
 
 // 获取新闻状态数量
 route.get('/api/pie_status',apiCtrl.pie_status)
+
+// 极验初始化API 获取流水标识并设置状态码
+route.get('/gt/register-click',apiCtrl.reg_click)
+
+// 极验二次验证
+route.post("/gt/validate-click",apiCtrl.val_click)
 module.exports = route

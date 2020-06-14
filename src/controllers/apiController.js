@@ -145,6 +145,11 @@ exports.newsadd_imgname = (req, res) => {
   let url = 'http://localhost:8888/news_img/' + req.file.filename
   url = `'${url}'`
   img_url_name = url
+  let resObj = { status: successStatus, message: '' }
+  resObj.message = '图片上传成功！'
+  let photo = url.replace(/'/g, '')
+  Object.assign(resObj, { photo })
+  res.end(JSON.stringify(resObj))
 }
 // 新增新闻
 exports.newsadd = (req, res) => {
@@ -376,7 +381,7 @@ exports.pie_type = (req, res) => {
       res.end(JSON.stringify(resObj))
     } else {
       resObj.message = '获取新闻类型成功!'
-      Object.assign(resObj,{list})
+      Object.assign(resObj, { list })
       res.end(JSON.stringify(resObj))
     }
   })
@@ -426,10 +431,75 @@ exports.pie_status = (req, res) => {
       res.end(JSON.stringify(resObj))
     } else {
       resObj.message = '获取新闻状态数量成功!'
-      Object.assign(resObj,{list})
+      Object.assign(resObj, { list })
       res.end(JSON.stringify(resObj))
     }
   })
+}
+
+// 极验获取流水标识码并设置状态
+var click = require('../static/click')
+exports.reg_click = (req, res) => {
+  click.register(null, function (err, data) {
+    // console.log(data)
+    if (err) {
+      // console.error(err);
+      res.status(500);
+      res.send(err);
+      return;
+    }
+
+    if (!data.success) {
+      // console.log(data)
+      // 进入 failback，如果一直进入此模式，请检查服务器到极验服务器是否可访问
+      apirefer
+
+      // 为以防万一，你可以选择以下两种方式之一：
+
+      // 1. 继续使用极验提供的failback备用方案
+      req.session.fallback = true;
+      res.send(data);
+
+      // 2. 使用自己提供的备用方案
+      // todo
+    } else {
+      // 正常模式
+      // console.log(data)
+      req.session.fallback = false;
+      res.send(data);
+    }
+  });
+}
+
+// 极验二次验证
+var Geetest = require('gt3-sdk');
+exports.val_click = (req, res) => {
+  // 对ajax提供的验证凭证进行二次验证
+  click.validate(req.session.fallback, {
+    geetest_challenge: req.body.geetest_challenge,
+    geetest_validate: req.body.geetest_validate,
+    geetest_seccode: req.body.geetest_seccode
+  }, function (err, success) {
+    if (err) {
+      // 网络错误
+      res.send({
+        status: "error",
+        info: err
+      });
+
+    } else if (!success) {
+      // 二次验证失败
+      res.send({
+        status: "fail",
+        info: '登录失败'
+      });
+    } else {
+      res.send({
+        status: "success",
+        info: '登录成功'
+      });
+    }
+  });
 }
 
 
